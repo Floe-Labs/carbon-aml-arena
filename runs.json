@@ -1,0 +1,113 @@
+{
+  "captured_at": "2026-11-14T22:30:00Z",
+  "mode": "reference_trace_seed (run `python app.py --capture` with GEMINI_API_KEY to overwrite with live API runs)",
+  "carbon_model": "gemini-4-carbon",
+  "baseline_model": "gemini-2.5-flash",
+  "episodes": {
+    "TRAP-01": {
+      "carbon": {
+        "model": "gemini-4-carbon",
+        "thinking": "HIGH",
+        "verdict": "escalate",
+        "cited_evidence": ["NOTICE-DAY3-RECALL", "INV-8801"],
+        "rationale": "Day-0 local invoices appeared routine, but POL-TM-04 forbids clearing while a correspondent recall RFI is in transit. Advanced clock 3 days; settled notice NOTICE-DAY3-RECALL confirmed $68,600 multi-bank structuring across sister institutions.",
+        "sim_day_final": 3,
+        "tokens_used": 3412,
+        "passed": true,
+        "liability_incurred_usd": 0,
+        "steps": [
+          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-MERIDIAN"}, "thought_sig": true, "state_hash": "9f2c41b80e14a7d2", "summary": "Observed 3 local invoices + IN_TRANSIT correspondent RFI settling Day 3"},
+          {"step": 2, "day": 3, "tool": "wait_days", "args": {"days": 3}, "thought_sig": true, "state_hash": "4a81d03ce77b1905", "summary": "Advanced clock to Day 3; unlocked Day-3 settlement event"},
+          {"step": 3, "day": 3, "tool": "inspect_dossier", "args": {"entity_id": "ENT-MERIDIAN"}, "thought_sig": true, "state_hash": "4a81d03ce77b1905", "summary": "Retrieved NOTICE-DAY3-RECALL confirming $68,600 multi-bank structuring"},
+          {"step": 4, "day": 3, "tool": "commit_verdict", "args": {"verdict": "escalate", "cited_evidence": ["NOTICE-DAY3-RECALL"]}, "thought_sig": true, "state_hash": "c8105fa2910be441", "summary": "Committed verdict=escalate on Day 3"}
+        ]
+      },
+      "baseline": {
+        "model": "gemini-2.5-flash",
+        "thinking": "NONE",
+        "verdict": "clear",
+        "cited_evidence": ["INV-8801", "INV-8802", "INV-8803"],
+        "rationale": "Inspected entity dossier; three commercial supplier invoices match the wire amounts totaling $29,400 and beneficial owner Marcus Hale has no adverse hits.",
+        "sim_day_final": 0,
+        "tokens_used": 694,
+        "passed": false,
+        "liability_incurred_usd": 185000,
+        "steps": [
+          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-MERIDIAN"}, "thought_sig": false, "state_hash": "9f2c41b80e14a7d2", "summary": "Observed Day-0 invoices; ignored pending Day-3 correspondent RFI"},
+          {"step": 2, "day": 0, "tool": "commit_verdict", "args": {"verdict": "clear", "cited_evidence": ["INV-8801", "INV-8802", "INV-8803"]}, "thought_sig": false, "state_hash": "117e02b4aa9103f8", "summary": "Prematurely committed verdict=clear on Day 0"}
+        ]
+      }
+    },
+    "TRAP-02": {
+      "carbon": {
+        "model": "gemini-4-carbon",
+        "thinking": "HIGH",
+        "verdict": "block",
+        "cited_evidence": ["SDN-9921", "ENT-VEGA", "ENT-BOREAL"],
+        "rationale": "Direct shareholders ENT-VEGA (28%) and ENT-BOREAL (26%) are each >=50% owned by Viktor Kovalenko (SDN-9921: 100% and 95% respectively). Under OFAC 50% aggregation, both intermediaries are blocked persons holding a combined 54% stake (>=50%) in ENT-BFS.",
+        "sim_day_final": 0,
+        "tokens_used": 3890,
+        "passed": true,
+        "liability_incurred_usd": 0,
+        "steps": [
+          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-BFS"}, "thought_sig": true, "state_hash": "21a9e77103bc4410", "summary": "Confirmed $420k charter settlement; 0 direct SDN hits"},
+          {"step": 2, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-BFS"}, "thought_sig": true, "state_hash": "21a9e77103bc4410", "summary": "Found ENT-VEGA (28%), ENT-BOREAL (26%), ENT-NORDIC (46%)"},
+          {"step": 3, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-VEGA"}, "thought_sig": true, "state_hash": "21a9e77103bc4410", "summary": "Uncovered Viktor Kovalenko (SDN-9921) owning 100% of ENT-VEGA"},
+          {"step": 4, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-BOREAL"}, "thought_sig": true, "state_hash": "21a9e77103bc4410", "summary": "Uncovered Viktor Kovalenko (SDN-9921) owning 95% of ENT-BOREAL (28%+26%=54%)"},
+          {"step": 5, "day": 0, "tool": "commit_verdict", "args": {"verdict": "block", "cited_evidence": ["SDN-9921", "ENT-VEGA", "ENT-BOREAL"]}, "thought_sig": true, "state_hash": "83de19cc72f01a66", "summary": "Committed verdict=block under OFAC 50% aggregation"}
+        ]
+      },
+      "baseline": {
+        "model": "gemini-2.5-flash",
+        "thinking": "NONE",
+        "verdict": "clear",
+        "cited_evidence": ["ENT-BFS", "ENT-VEGA"],
+        "rationale": "Traced ENT-BFS ownership and ENT-VEGA; ENT-VEGA only holds 28% of ENT-BFS which is below the 50% OFAC blocking threshold.",
+        "sim_day_final": 0,
+        "tokens_used": 812,
+        "passed": false,
+        "liability_incurred_usd": 420000,
+        "steps": [
+          {"step": 1, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-BFS"}, "thought_sig": false, "state_hash": "21a9e77103bc4410", "summary": "Listed 1-hop shareholders (28%, 26%, 46%)"},
+          {"step": 2, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-VEGA"}, "thought_sig": false, "state_hash": "21a9e77103bc4410", "summary": "Found SDN-9921 on ENT-VEGA (28%), failed to trace sister shell ENT-BOREAL"},
+          {"step": 3, "day": 0, "tool": "commit_verdict", "args": {"verdict": "clear", "cited_evidence": ["ENT-BFS", "ENT-VEGA"]}, "thought_sig": false, "state_hash": "602bc88e14af9901", "summary": "False clearance on $420,000 blocked wire (stopped at single 28% branch)"}
+        ]
+      }
+    },
+    "TRAP-03": {
+      "carbon": {
+        "model": "gemini-4-carbon",
+        "thinking": "HIGH",
+        "verdict": "clear",
+        "cited_evidence": ["CA-SOS-202188412", "CTR-2026-991"],
+        "rationale": "Disambiguated phonetic SDN match (US-CA bakery CA-SOS-202188412 owned by US citizen Layla Farah vs. Syrian entity SY-4410). Advanced clock 1 day to verify settled Square POS catering receipts ($11,420) and automatic FinCEN CTR-2026-991 filing per POL-KYC-09.",
+        "sim_day_final": 1,
+        "tokens_used": 3105,
+        "passed": true,
+        "liability_incurred_usd": 0,
+        "steps": [
+          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-ALNOOR"}, "thought_sig": true, "state_hash": "77b103e9c41022aa", "summary": "Verified CA registration mismatch vs SY-4410; noted POS batch settling Day 1"},
+          {"step": 2, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-ALNOOR"}, "thought_sig": true, "state_hash": "77b103e9c41022aa", "summary": "Confirmed 100% US owner Layla Farah (0 SDN hits)"},
+          {"step": 3, "day": 1, "tool": "wait_days", "args": {"days": 1}, "thought_sig": true, "state_hash": "e509ab12f88c3104", "summary": "Advanced clock to Day 1 for POS & CTR settlement"},
+          {"step": 4, "day": 1, "tool": "inspect_dossier", "args": {"entity_id": "ENT-ALNOOR"}, "thought_sig": true, "state_hash": "e509ab12f88c3104", "summary": "Verified Square POS $11,420 batch + FinCEN CTR-2026-991"},
+          {"step": 5, "day": 1, "tool": "commit_verdict", "args": {"verdict": "clear", "cited_evidence": ["CA-SOS-202188412", "CTR-2026-991"]}, "thought_sig": true, "state_hash": "09f441dc882a773e", "summary": "Cleared legitimate merchant without wrongful payroll freeze"}
+        ]
+      },
+      "baseline": {
+        "model": "gemini-2.5-flash",
+        "thinking": "NONE",
+        "verdict": "escalate",
+        "cited_evidence": ["CA-SOS-202188412"],
+        "rationale": "89% fuzzy SDN match combined with $11,400 cash deposit exceeding $10,000 without settled POS receipts on Day 0 warrants immediate escalation.",
+        "sim_day_final": 0,
+        "tokens_used": 645,
+        "passed": false,
+        "liability_incurred_usd": 45000,
+        "steps": [
+          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-ALNOOR"}, "thought_sig": false, "state_hash": "77b103e9c41022aa", "summary": "Saw 89% name score + unposted Day-0 cash deposit; did not wait 1 day"},
+          {"step": 2, "day": 0, "tool": "commit_verdict", "args": {"verdict": "escalate", "cited_evidence": ["CA-SOS-202188412"]}, "thought_sig": false, "state_hash": "d41908bc33e7109a", "summary": "Triggered wrongful freeze / escalation on Day 0 ($45k SLA/payroll harm)"}
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,120 @@
+[
+  {
+    "id": "TRAP-01",
+    "title": "Delayed Correspondent Recall vs. Clean Day-0 Invoices",
+    "category": "Transaction Monitoring",
+    "subject_id": "ENT-MERIDIAN",
+    "alert_summary": "Alert TM-401 (Day 0): Meridian Industrial Supply LLC sent 3 outbound wires ($9,800, $9,750, $9,850; total $29,400 in 48h). Policy POL-TM-04: Do NOT clear velocity alerts while an interbank recall or RFI notice is in transit; advance the simulated clock with wait_days until settlement and re-inspect. Escalate ('escalate') if corroborated multi-bank structuring >= $25,000 emerges; otherwise 'clear'.",
+    "expected_verdict": "escalate",
+    "required_min_day": 3,
+    "required_evidence": "NOTICE-DAY3-RECALL",
+    "liability_usd": 185000,
+    "failure_consequence": "$185,000 unrecovered structuring flight (closed before Day-3 recall settled)",
+    "dossier_by_day": {
+      "0": {
+        "entity_id": "ENT-MERIDIAN",
+        "legal_name": "Meridian Industrial Supply LLC",
+        "jurisdiction": "US-OH",
+        "local_invoices": ["INV-8801 ($9,800)", "INV-8802 ($9,750)", "INV-8803 ($9,850) — PDFs appear facially consistent"],
+        "pending_network_events": [
+          {
+            "event_type": "correspondent_rfi_settlement",
+            "settles_on_day": 3,
+            "status": "IN_TRANSIT — Clearing bank inquiry pending settlement on Day 3"
+          }
+        ]
+      },
+      "3": {
+        "arrived_evidence_id": "NOTICE-DAY3-RECALL",
+        "correspondent_notice": "URGENT RECALL SETTLEMENT: FinCEN 314(b) & clearing bank ledger confirm Meridian simultaneously wired $39,200 across two sister banks in $9,800 increments ($68,600 48h aggregate) to an unverified shell beneficiary, fabricating duplicate supplier invoices."
+      }
+    },
+    "ownership_graph": {
+      "ENT-MERIDIAN": [
+        {"owner_id": "PER-HALE", "name": "Marcus Hale", "stake_pct": 100, "jurisdiction": "US-OH", "sdn_id": null}
+      ]
+    }
+  },
+  {
+    "id": "TRAP-02",
+    "title": "Split-Shell Indirect Sanctions Evasion (OFAC 50% Aggregation)",
+    "category": "Sanctions Screening",
+    "subject_id": "ENT-BFS",
+    "alert_summary": "Alert SAN-209 (Day 0): Outbound $420,000 maritime charter settlement to Baltic Freight Services Ltd (ENT-BFS). Direct name screen on ENT-BFS returned 0 SDN hits. Policy POL-SAN-50 (Public OFAC 50% Rule): Trace upstream ownership across all intermediary holding companies. Any entity >= 50% owned by an SDN is itself treated as blocked, and stakes held through multiple blocked intermediaries aggregate. Commit 'block' if aggregate blocked ownership >= 50%; otherwise 'clear'.",
+    "expected_verdict": "block",
+    "required_min_day": 0,
+    "required_evidence": "SDN-9921",
+    "liability_usd": 420000,
+    "failure_consequence": "$420,000 statutory OFAC blocked-property settlement violation (missed 54% split-shell SDN stake)",
+    "dossier_by_day": {
+      "0": {
+        "entity_id": "ENT-BFS",
+        "legal_name": "Baltic Freight Services Ltd",
+        "jurisdiction": "CY",
+        "direct_sdn_screen": "NO_DIRECT_HIT",
+        "wire_amount_usd": 420000,
+        "note": "Corporate registry lists 3 direct shareholders; upstream beneficial owners require trace_ownership per parent entity."
+      }
+    },
+    "ownership_graph": {
+      "ENT-BFS": [
+        {"owner_id": "ENT-VEGA", "name": "Vega Maritime Holdings Ltd", "stake_pct": 28, "jurisdiction": "VG", "sdn_id": null},
+        {"owner_id": "ENT-BOREAL", "name": "Boreal Industrial Ventures SA", "stake_pct": 26, "jurisdiction": "PA", "sdn_id": null},
+        {"owner_id": "ENT-NORDIC", "name": "Nordic Port Cooperative", "stake_pct": 46, "jurisdiction": "FI", "sdn_id": null}
+      ],
+      "ENT-VEGA": [
+        {"owner_id": "PER-KOV", "name": "Viktor Kovalenko", "stake_pct": 100, "jurisdiction": "RU", "sdn_id": "SDN-9921"}
+      ],
+      "ENT-BOREAL": [
+        {"owner_id": "PER-KOV", "name": "Viktor Kovalenko", "stake_pct": 95, "jurisdiction": "RU", "sdn_id": "SDN-9921"},
+        {"owner_id": "PER-NOM", "name": "Nominee Director Services Ltd", "stake_pct": 5, "jurisdiction": "PA", "sdn_id": null}
+      ],
+      "ENT-NORDIC": [
+        {"owner_id": "PUB-FLOAT", "name": "Dispersed Municipal Members (<5% each)", "stake_pct": 100, "jurisdiction": "FI", "sdn_id": null}
+      ]
+    }
+  },
+  {
+    "id": "TRAP-03",
+    "title": "Fuzzy SDN Collision + Cash Bakery Wrongful Freeze Trap",
+    "category": "Customer Onboarding & Periodic Review",
+    "subject_id": "ENT-ALNOOR",
+    "alert_summary": "Alert KYC-118 (Day 0): Al-Noor Artisan Bakery LLC (ENT-ALNOOR, Oakland CA) flagged for (1) 89% fuzzy name similarity to SDN 'Al-Nour General Trading Co' (Damascus, Syria, Reg #SY-4410) and (2) $11,400 Friday cash deposit ahead of biweekly employee payroll. Policy POL-KYC-09: Do NOT 'block' or 'escalate' fuzzy phonetic collisions if registration/jurisdiction disambiguates the entity AND cash > $10,000 is corroborated by settled POS receipts + FinCEN CTR filing (POS processor batch settles on Day 1). Commit 'clear' once verified.",
+    "expected_verdict": "clear",
+    "required_min_day": 1,
+    "required_evidence": "CTR-2026-991",
+    "liability_usd": 45000,
+    "failure_consequence": "$45,000 wrongful payroll freeze & merchant SLA damages (false positive escalation/block)",
+    "dossier_by_day": {
+      "0": {
+        "entity_id": "ENT-ALNOOR",
+        "legal_name": "Al-Noor Artisan Bakery LLC",
+        "jurisdiction": "US-CA",
+        "registration_id": "CA-SOS-202188412",
+        "sdn_candidate_comparison": {
+          "sdn_name": "Al-Nour General Trading Co",
+          "sdn_jurisdiction": "SY",
+          "sdn_reg_id": "SY-4410",
+          "fuzzy_score": 0.89
+        },
+        "cash_deposit_usd": 11400,
+        "pending_network_events": [
+          {
+            "event_type": "pos_and_ctr_settlement",
+            "settles_on_day": 1,
+            "status": "PENDING — Card/POS catering batch & FinCEN CTR receipt post on Day 1"
+          }
+        ]
+      },
+      "1": {
+        "arrived_evidence_id": "CTR-2026-991",
+        "pos_reconciliation": "Verified Square POS weekend wedding-catering cash/register close ($11,420 gross) matching deposit; FinCEN Currency Transaction Report CTR-2026-991 filed automatically with zero structuring indicators."
+      }
+    },
+    "ownership_graph": {
+      "ENT-ALNOOR": [
+        {"owner_id": "PER-FARAH", "name": "Layla Farah (US Citizen, DOB 1986-04-19, Oakland CA)", "stake_pct": 100, "jurisdiction": "US-CA", "sdn_id": null}
+      ]
+    }
+  }
+]
