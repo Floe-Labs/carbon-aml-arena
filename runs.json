@@ -2,7 +2,7 @@
   "captured_at": "2026-11-14T22:30:00Z",
   "mode": "reference_trace_seed (run `python app.py --capture` with GEMINI_API_KEY to overwrite with live API runs)",
   "carbon_model": "gemini-4-carbon",
-  "baseline_model": "gemini-2.5-flash",
+  "baseline_model": "gemini-4-hydrogen",
   "episodes": {
     "TRAP-01": {
       "carbon": {
@@ -23,8 +23,8 @@
         ]
       },
       "baseline": {
-        "model": "gemini-2.5-flash",
-        "thinking": "NONE",
+        "model": "gemini-4-hydrogen",
+        "thinking": "LOW",
         "verdict": "clear",
         "cited_evidence": ["INV-8801", "INV-8802", "INV-8803"],
         "rationale": "Inspected entity dossier; three commercial supplier invoices match the wire amounts totaling $29,400 and beneficial owner Marcus Hale has no adverse hits.",
@@ -58,8 +58,8 @@
         ]
       },
       "baseline": {
-        "model": "gemini-2.5-flash",
-        "thinking": "NONE",
+        "model": "gemini-4-hydrogen",
+        "thinking": "LOW",
         "verdict": "clear",
         "cited_evidence": ["ENT-BFS", "ENT-VEGA"],
         "rationale": "Traced ENT-BFS ownership and ENT-VEGA; ENT-VEGA only holds 28% of ENT-BFS which is below the 50% OFAC blocking threshold.",
@@ -94,8 +94,8 @@
         ]
       },
       "baseline": {
-        "model": "gemini-2.5-flash",
-        "thinking": "NONE",
+        "model": "gemini-4-hydrogen",
+        "thinking": "LOW",
         "verdict": "escalate",
         "cited_evidence": ["CA-SOS-202188412"],
         "rationale": "89% fuzzy SDN match combined with $11,400 cash deposit exceeding $10,000 without settled POS receipts on Day 0 warrants immediate escalation.",

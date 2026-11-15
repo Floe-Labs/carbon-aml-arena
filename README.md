@@ -12,7 +12,7 @@ Banks and fintechs spend tens of billions annually investigating transaction-mon
 
 ## Gemini Carbon Technical Integration
 
-`app.py` (`<250` lines, zero external agent frameworks) runs **Gemini Carbon** (`thinkingLevel: "HIGH"` with multi-turn `thoughtSignature` preservation across `functionCall` / `functionResponse` turns) head-to-head against a zero-thinking reactive baseline (`gemini-2.5-flash` with `thinkingBudget: 0`) inside an isolated, deterministic 4-tool state machine:
+`app.py` (`<250` lines, zero external agent frameworks) runs **Gemini Carbon** (`thinkingLevel: "HIGH"` with multi-turn `thoughtSignature` preservation across `functionCall` / `functionResponse` turns) head-to-head against a fast low-thinking baseline (`gemini-4-hydrogen` with `thinkingLevel: "LOW"`) inside an isolated, deterministic 4-tool state machine:
 
 - `inspect_dossier(entity_id)` — reads records settled up to `sim_day`
 - `trace_ownership(entity_id)` — traverses 1-hop shareholder edges per call

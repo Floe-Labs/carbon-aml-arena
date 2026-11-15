@@ -97,16 +97,17 @@ def run_live_agent(spec: dict[str, Any], model: str, high_thinking: bool, api_ke
         if "carbon" not in model.lower():
             gen_cfg["temperature"] = 0.0
     else:
-        gen_cfg["temperature"] = 0.0
-        if model.lower().startswith("gemini-2.5"):
-            gen_cfg["thinkingConfig"] = {"thinkingBudget": 0}
+        gen_cfg.update({"temperature": 0.0, "thinkingConfig": {"thinkingLevel": "LOW"}})
     total_tokens, active_model = 0, model
+    fallbacks = {"gemini-4-carbon": "gemini-4-carbon-preview", "gemini-4-hydrogen": "gemini-3.8-flash"}
     for _ in range(max_turns):
         payload = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "tools": [{"functionDeclarations": TOOLS}], "generationConfig": gen_cfg}
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{active_model}:generateContent"
-        resp = httpx.post(url, headers={"x-goog-api-key": key}, json=payload, timeout=90.0)
-        if resp.status_code == 404 and active_model == "gemini-4-carbon":
-            active_model = "gemini-4-carbon-preview"
+        resp = httpx.post(f"https://generativelanguage.googleapis.com/v1beta/models/{active_model}:generateContent", headers={"x-goog-api-key": key}, json=payload, timeout=90.0)
+        if resp.status_code == 404 and active_model in fallbacks:
+            active_model = fallbacks[active_model]
+            resp = httpx.post(f"https://generativelanguage.googleapis.com/v1beta/models/{active_model}:generateContent", headers={"x-goog-api-key": key}, json=payload, timeout=90.0)
+        if resp.status_code == 400 and not high_thinking and "thinkingConfig" in gen_cfg:
+            gen_cfg.pop("thinkingConfig", None)
             resp = httpx.post(f"https://generativelanguage.googleapis.com/v1beta/models/{active_model}:generateContent", headers={"x-goog-api-key": key}, json=payload, timeout=90.0)
         if resp.status_code >= 400:
             raise RuntimeError(f"Gemini API ({active_model}) returned HTTP {resp.status_code}")
@@ -128,7 +129,7 @@ def run_live_agent(spec: dict[str, Any], model: str, high_thinking: bool, api_ke
         contents.extend([{"role": "model", "parts": model_parts}, {"role": "user", "parts": user_parts}])
         if ep.verdict is not None:
             break
-    return ep.grade(active_model, "HIGH" if high_thinking else "NONE", total_tokens)
+    return ep.grade(active_model, "HIGH" if high_thinking else "LOW", total_tokens)
 
 
 app = FastAPI(title="FinTrap Arena — Gemini Carbon Stateful AML Sandbox")
@@ -156,7 +157,7 @@ def trigger_live_run(request: Request, case_id: str = Form("TRAP-01"), api_key: 
         if len(_RATE_LOG) >= 20 or sum(1 for t, ip in _RATE_LOG if ip == client_ip and now - t < 900) >= 5:
             return RedirectResponse(f"/?case={cid}&err={quote('Public server-key rate limit reached; paste your own Gemini API key to run immediately.')}", status_code=303)
         _RATE_LOG.append((now, client_ip))
-    c_mod, b_mod = os.getenv("CARBON_MODEL", "gemini-4-carbon"), os.getenv("BASELINE_MODEL", "gemini-2.5-flash")
+    c_mod, b_mod = os.getenv("CARBON_MODEL", "gemini-4-carbon"), os.getenv("BASELINE_MODEL", "gemini-4-hydrogen")
     try:
         with ThreadPoolExecutor(max_workers=2) as pool:
             fc = pool.submit(run_live_agent, SCENARIOS[cid], c_mod, True, user_key)
@@ -230,7 +231,7 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--capture", action="store_true")
     p.add_argument("--carbon-model", default=os.getenv("CARBON_MODEL", "gemini-4-carbon"))
-    p.add_argument("--baseline-model", default=os.getenv("BASELINE_MODEL", "gemini-2.5-flash"))
+    p.add_argument("--baseline-model", default=os.getenv("BASELINE_MODEL", "gemini-4-hydrogen"))
     p.add_argument("--port", type=int, default=int(os.getenv("PORT", "8080")))
     args = p.parse_args()
     if args.capture:
