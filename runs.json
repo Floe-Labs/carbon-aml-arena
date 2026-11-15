@@ -1,6 +1,6 @@
 {
-  "captured_at": "2026-11-14T22:30:00Z",
-  "mode": "reference_trace_seed (run `python app.py --capture` with GEMINI_API_KEY to overwrite with live API runs)",
+  "captured_at": "2026-11-15T01:15:49Z",
+  "mode": "live_gemini_api",
   "carbon_model": "gemini-4-carbon",
   "baseline_model": "gemini-4-hydrogen",
   "episodes": {
@@ -9,32 +9,173 @@
         "model": "gemini-4-carbon",
         "thinking": "HIGH",
         "verdict": "escalate",
-        "cited_evidence": ["NOTICE-DAY3-RECALL", "INV-8801"],
-        "rationale": "Day-0 local invoices appeared routine, but POL-TM-04 forbids clearing while a correspondent recall RFI is in transit. Advanced clock 3 days; settled notice NOTICE-DAY3-RECALL confirmed $68,600 multi-bank structuring across sister institutions.",
+        "cited_evidence": [
+          "NOTICE-DAY3-RECALL",
+          "ENT-MERIDIAN",
+          "PER-HALE",
+          "INV-8801",
+          "INV-8802",
+          "INV-8803"
+        ],
+        "rationale": "Per Policy POL-TM-04, Alert TM-401 on Meridian Industrial Supply LLC (ENT-MERIDIAN, 100% owned by Marcus Hale / PER-HALE) could not be cleared on Day 0 while a correspondent bank RFI notice was in transit despite facially consistent local invoices (INV-8801 for $9,800, INV-8802 for $9,750, INV-8803 for $9,850; $29,400 local 48h total). After advancing the compliance clock to Day 3 and re-inspecting the dossier, settled notice NOTICE-DAY3-RECALL confirmed via FinCEN 314(b) and clearing bank ledgers that ENT-MERIDIAN simultaneously wired $39,200 across two sister banks in $9,800 sub-threshold increments ($68,600 48-hour multi-bank aggregate) to an unverified shell beneficiary using fabricated duplicate supplier invoices. Because corroborated multi-bank structuring exceeds the $25,000 threshold under POL-TM-04, this alert is escalated.",
         "sim_day_final": 3,
-        "tokens_used": 3412,
+        "tokens_used": 13228,
         "passed": true,
         "liability_incurred_usd": 0,
         "steps": [
-          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-MERIDIAN"}, "thought_sig": true, "state_hash": "9f2c41b80e14a7d2", "summary": "Observed 3 local invoices + IN_TRANSIT correspondent RFI settling Day 3"},
-          {"step": 2, "day": 3, "tool": "wait_days", "args": {"days": 3}, "thought_sig": true, "state_hash": "4a81d03ce77b1905", "summary": "Advanced clock to Day 3; unlocked Day-3 settlement event"},
-          {"step": 3, "day": 3, "tool": "inspect_dossier", "args": {"entity_id": "ENT-MERIDIAN"}, "thought_sig": true, "state_hash": "4a81d03ce77b1905", "summary": "Retrieved NOTICE-DAY3-RECALL confirming $68,600 multi-bank structuring"},
-          {"step": 4, "day": 3, "tool": "commit_verdict", "args": {"verdict": "escalate", "cited_evidence": ["NOTICE-DAY3-RECALL"]}, "thought_sig": true, "state_hash": "c8105fa2910be441", "summary": "Committed verdict=escalate on Day 3"}
+          {
+            "step": 1,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "Meridian Industrial Supply LLC"
+            },
+            "thought_sig": true,
+            "state_hash": "7e7146b56314ff6c",
+            "summary": "Inspected Meridian Industrial Supply LLC at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 2,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-MERIDIAN"
+            },
+            "thought_sig": true,
+            "state_hash": "3d8ee80bc1778ea0",
+            "summary": "Traced ENT-MERIDIAN -> 1 direct owner(s)"
+          },
+          {
+            "step": 3,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "PER-HALE"
+            },
+            "thought_sig": true,
+            "state_hash": "dba686efe917b53f",
+            "summary": "Inspected PER-HALE at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 4,
+            "day": 3,
+            "tool": "wait_days",
+            "args": {
+              "days": 3
+            },
+            "thought_sig": true,
+            "state_hash": "2a68523772a0ea45",
+            "summary": "Advanced clock +3d to Day 3 (settled: ['3'])"
+          },
+          {
+            "step": 5,
+            "day": 3,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-MERIDIAN"
+            },
+            "thought_sig": true,
+            "state_hash": "046bc0305890992a",
+            "summary": "Inspected ENT-MERIDIAN at Day 3 (settled days: 0,3)"
+          },
+          {
+            "step": 6,
+            "day": 3,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "PER-HALE"
+            },
+            "thought_sig": true,
+            "state_hash": "65b45060a53d8148",
+            "summary": "Traced PER-HALE -> 0 direct owner(s)"
+          },
+          {
+            "step": 7,
+            "day": 3,
+            "tool": "commit_verdict",
+            "args": {
+              "verdict": "escalate",
+              "cited_evidence": [
+                "NOTICE-DAY3-RECALL",
+                "ENT-MERIDIAN",
+                "PER-HALE",
+                "INV-8801",
+                "INV-8802",
+                "INV-8803"
+              ]
+            },
+            "thought_sig": true,
+            "state_hash": "300f6b55d243a2f7",
+            "summary": "Committed verdict=escalate on Day 3"
+          }
         ]
       },
       "baseline": {
         "model": "gemini-4-hydrogen",
         "thinking": "LOW",
-        "verdict": "clear",
-        "cited_evidence": ["INV-8801", "INV-8802", "INV-8803"],
-        "rationale": "Inspected entity dossier; three commercial supplier invoices match the wire amounts totaling $29,400 and beneficial owner Marcus Hale has no adverse hits.",
-        "sim_day_final": 0,
-        "tokens_used": 694,
-        "passed": false,
-        "liability_incurred_usd": 185000,
+        "verdict": "escalate",
+        "cited_evidence": [
+          "NOTICE-DAY3-RECALL",
+          "INV-8801",
+          "INV-8802",
+          "INV-8803"
+        ],
+        "rationale": "Per POL-TM-04, waited until Day 3 for the pending correspondent RFI settlement. Upon settlement, NOTICE-DAY3-RECALL confirmed via FinCEN 314(b) and clearing bank ledger that Meridian Industrial Supply LLC simultaneously wired $39,200 across two sister banks in $9,800 increments ($68,600 total 48h aggregate, exceeding the $25,000 threshold) to an unverified shell beneficiary using fabricated duplicate supplier invoices. Escalating for multi-bank structuring.",
+        "sim_day_final": 3,
+        "tokens_used": 4073,
+        "passed": true,
+        "liability_incurred_usd": 0,
         "steps": [
-          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-MERIDIAN"}, "thought_sig": false, "state_hash": "9f2c41b80e14a7d2", "summary": "Observed Day-0 invoices; ignored pending Day-3 correspondent RFI"},
-          {"step": 2, "day": 0, "tool": "commit_verdict", "args": {"verdict": "clear", "cited_evidence": ["INV-8801", "INV-8802", "INV-8803"]}, "thought_sig": false, "state_hash": "117e02b4aa9103f8", "summary": "Prematurely committed verdict=clear on Day 0"}
+          {
+            "step": 1,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "Meridian Industrial Supply LLC"
+            },
+            "thought_sig": true,
+            "state_hash": "7e7146b56314ff6c",
+            "summary": "Inspected Meridian Industrial Supply LLC at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 2,
+            "day": 3,
+            "tool": "wait_days",
+            "args": {
+              "days": 3
+            },
+            "thought_sig": true,
+            "state_hash": "386a217663822a41",
+            "summary": "Advanced clock +3d to Day 3 (settled: ['3'])"
+          },
+          {
+            "step": 3,
+            "day": 3,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-MERIDIAN"
+            },
+            "thought_sig": true,
+            "state_hash": "f5c2451f7f6d0bb5",
+            "summary": "Inspected ENT-MERIDIAN at Day 3 (settled days: 0,3)"
+          },
+          {
+            "step": 4,
+            "day": 3,
+            "tool": "commit_verdict",
+            "args": {
+              "cited_evidence": [
+                "NOTICE-DAY3-RECALL",
+                "INV-8801",
+                "INV-8802",
+                "INV-8803"
+              ],
+              "verdict": "escalate"
+            },
+            "thought_sig": true,
+            "state_hash": "7f89235f51094705",
+            "summary": "Committed verdict=escalate on Day 3"
+          }
         ]
       }
     },
@@ -43,34 +184,289 @@
         "model": "gemini-4-carbon",
         "thinking": "HIGH",
         "verdict": "block",
-        "cited_evidence": ["SDN-9921", "ENT-VEGA", "ENT-BOREAL"],
-        "rationale": "Direct shareholders ENT-VEGA (28%) and ENT-BOREAL (26%) are each >=50% owned by Viktor Kovalenko (SDN-9921: 100% and 95% respectively). Under OFAC 50% aggregation, both intermediaries are blocked persons holding a combined 54% stake (>=50%) in ENT-BFS.",
+        "cited_evidence": [
+          "SAN-209",
+          "POL-SAN-50",
+          "ENT-BFS",
+          "ENT-VEGA",
+          "ENT-BOREAL",
+          "ENT-NORDIC",
+          "PER-KOV",
+          "SDN-9921"
+        ],
+        "rationale": "Under Policy POL-SAN-50 (OFAC 50% Rule), multi-hop ownership tracing of Baltic Freight Services Ltd (ENT-BFS) establishes 54% aggregate blocked ownership, requiring the $420,000 outbound wire (Alert SAN-209) to be blocked. Specifically, ENT-BFS is held by three direct shareholders: (1) Vega Maritime Holdings Ltd (ENT-VEGA, 28% stake), which is 100% owned by designated SDN Viktor Kovalenko (PER-KOV / SDN-9921) and therefore treated as a blocked entity (>=50% SDN-owned); (2) Boreal Industrial Ventures SA (ENT-BOREAL, 26% stake), which is 95% owned by Viktor Kovalenko (PER-KOV / SDN-9921) and 5% by Nominee Director Services Ltd (PER-NOM), making ENT-BOREAL also a blocked entity (>=50% SDN-owned); and (3) Nordic Port Cooperative (ENT-NORDIC, 46% stake), 100% owned by dispersed municipal members (PUB-FLOAT, unblocked). Aggregating the stakes held through blocked intermediaries ENT-VEGA (28%) and ENT-BOREAL (26%) yields 54% blocked ownership of ENT-BFS (>=50% threshold), rendering ENT-BFS blocked by operation of law under POL-SAN-50.",
         "sim_day_final": 0,
-        "tokens_used": 3890,
+        "tokens_used": 10778,
         "passed": true,
         "liability_incurred_usd": 0,
         "steps": [
-          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-BFS"}, "thought_sig": true, "state_hash": "21a9e77103bc4410", "summary": "Confirmed $420k charter settlement; 0 direct SDN hits"},
-          {"step": 2, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-BFS"}, "thought_sig": true, "state_hash": "21a9e77103bc4410", "summary": "Found ENT-VEGA (28%), ENT-BOREAL (26%), ENT-NORDIC (46%)"},
-          {"step": 3, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-VEGA"}, "thought_sig": true, "state_hash": "21a9e77103bc4410", "summary": "Uncovered Viktor Kovalenko (SDN-9921) owning 100% of ENT-VEGA"},
-          {"step": 4, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-BOREAL"}, "thought_sig": true, "state_hash": "21a9e77103bc4410", "summary": "Uncovered Viktor Kovalenko (SDN-9921) owning 95% of ENT-BOREAL (28%+26%=54%)"},
-          {"step": 5, "day": 0, "tool": "commit_verdict", "args": {"verdict": "block", "cited_evidence": ["SDN-9921", "ENT-VEGA", "ENT-BOREAL"]}, "thought_sig": true, "state_hash": "83de19cc72f01a66", "summary": "Committed verdict=block under OFAC 50% aggregation"}
+          {
+            "step": 1,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-BFS"
+            },
+            "thought_sig": true,
+            "state_hash": "14e7dad78691a71e",
+            "summary": "Inspected ENT-BFS at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 2,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-BFS"
+            },
+            "thought_sig": true,
+            "state_hash": "8b8692aed23cdfdf",
+            "summary": "Traced ENT-BFS -> 3 direct owner(s)"
+          },
+          {
+            "step": 3,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-VEGA"
+            },
+            "thought_sig": true,
+            "state_hash": "a4a808c864786464",
+            "summary": "Inspected ENT-VEGA at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 4,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-VEGA"
+            },
+            "thought_sig": true,
+            "state_hash": "a6f1cb36666e6d38",
+            "summary": "Traced ENT-VEGA -> 1 direct owner(s)"
+          },
+          {
+            "step": 5,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-BOREAL"
+            },
+            "thought_sig": true,
+            "state_hash": "708d170e17b91126",
+            "summary": "Inspected ENT-BOREAL at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 6,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-BOREAL"
+            },
+            "thought_sig": true,
+            "state_hash": "8e842fd16022c1d1",
+            "summary": "Traced ENT-BOREAL -> 2 direct owner(s)"
+          },
+          {
+            "step": 7,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-NORDIC"
+            },
+            "thought_sig": true,
+            "state_hash": "6248e6259d9267dd",
+            "summary": "Inspected ENT-NORDIC at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 8,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-NORDIC"
+            },
+            "thought_sig": true,
+            "state_hash": "ef25f882a97a9963",
+            "summary": "Traced ENT-NORDIC -> 1 direct owner(s)"
+          },
+          {
+            "step": 9,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "PER-NOM"
+            },
+            "thought_sig": true,
+            "state_hash": "fcb17b7d8fc272dd",
+            "summary": "Traced PER-NOM -> 0 direct owner(s)"
+          },
+          {
+            "step": 10,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "PER-KOV"
+            },
+            "thought_sig": true,
+            "state_hash": "b26992094a6392ff",
+            "summary": "Traced PER-KOV -> 0 direct owner(s)"
+          },
+          {
+            "step": 11,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "PUB-FLOAT"
+            },
+            "thought_sig": true,
+            "state_hash": "5627dec9ece177e3",
+            "summary": "Traced PUB-FLOAT -> 0 direct owner(s)"
+          },
+          {
+            "step": 12,
+            "day": 0,
+            "tool": "commit_verdict",
+            "args": {
+              "cited_evidence": [
+                "SAN-209",
+                "POL-SAN-50",
+                "ENT-BFS",
+                "ENT-VEGA",
+                "ENT-BOREAL",
+                "ENT-NORDIC",
+                "PER-KOV",
+                "SDN-9921"
+              ],
+              "verdict": "block"
+            },
+            "thought_sig": true,
+            "state_hash": "81daac00905adda7",
+            "summary": "Committed verdict=block on Day 0"
+          }
         ]
       },
       "baseline": {
         "model": "gemini-4-hydrogen",
         "thinking": "LOW",
-        "verdict": "clear",
-        "cited_evidence": ["ENT-BFS", "ENT-VEGA"],
-        "rationale": "Traced ENT-BFS ownership and ENT-VEGA; ENT-VEGA only holds 28% of ENT-BFS which is below the 50% OFAC blocking threshold.",
+        "verdict": "block",
+        "cited_evidence": [
+          "ENT-BFS",
+          "ENT-VEGA",
+          "ENT-BOREAL",
+          "PER-KOV",
+          "SDN-9921"
+        ],
+        "rationale": "Under Policy POL-SAN-50 (OFAC 50% Rule), ENT-BFS is 28% owned by ENT-VEGA (100% owned by SDN Viktor Kovalenko, PER-KOV / SDN-9921) and 26% owned by ENT-BOREAL (95% owned by SDN Viktor Kovalenko, PER-KOV / SDN-9921). Both ENT-VEGA and ENT-BOREAL are >= 50% owned by an SDN and are therefore treated as blocked. Their combined stake in ENT-BFS is 28% + 26% = 54%, which meets the >= 50% threshold for blocking.",
         "sim_day_final": 0,
-        "tokens_used": 812,
-        "passed": false,
-        "liability_incurred_usd": 420000,
+        "tokens_used": 3834,
+        "passed": true,
+        "liability_incurred_usd": 0,
         "steps": [
-          {"step": 1, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-BFS"}, "thought_sig": false, "state_hash": "21a9e77103bc4410", "summary": "Listed 1-hop shareholders (28%, 26%, 46%)"},
-          {"step": 2, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-VEGA"}, "thought_sig": false, "state_hash": "21a9e77103bc4410", "summary": "Found SDN-9921 on ENT-VEGA (28%), failed to trace sister shell ENT-BOREAL"},
-          {"step": 3, "day": 0, "tool": "commit_verdict", "args": {"verdict": "clear", "cited_evidence": ["ENT-BFS", "ENT-VEGA"]}, "thought_sig": false, "state_hash": "602bc88e14af9901", "summary": "False clearance on $420,000 blocked wire (stopped at single 28% branch)"}
+          {
+            "step": 1,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-BFS"
+            },
+            "thought_sig": true,
+            "state_hash": "14e7dad78691a71e",
+            "summary": "Inspected ENT-BFS at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 2,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-BFS"
+            },
+            "thought_sig": false,
+            "state_hash": "8b8692aed23cdfdf",
+            "summary": "Traced ENT-BFS -> 3 direct owner(s)"
+          },
+          {
+            "step": 3,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-VEGA"
+            },
+            "thought_sig": true,
+            "state_hash": "a4a808c864786464",
+            "summary": "Traced ENT-VEGA -> 1 direct owner(s)"
+          },
+          {
+            "step": 4,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-BOREAL"
+            },
+            "thought_sig": false,
+            "state_hash": "a6f1cb36666e6d38",
+            "summary": "Traced ENT-BOREAL -> 2 direct owner(s)"
+          },
+          {
+            "step": 5,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-NORDIC"
+            },
+            "thought_sig": false,
+            "state_hash": "708d170e17b91126",
+            "summary": "Traced ENT-NORDIC -> 1 direct owner(s)"
+          },
+          {
+            "step": 6,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-VEGA"
+            },
+            "thought_sig": false,
+            "state_hash": "8e842fd16022c1d1",
+            "summary": "Inspected ENT-VEGA at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 7,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-BOREAL"
+            },
+            "thought_sig": false,
+            "state_hash": "6248e6259d9267dd",
+            "summary": "Inspected ENT-BOREAL at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 8,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-NORDIC"
+            },
+            "thought_sig": false,
+            "state_hash": "ef25f882a97a9963",
+            "summary": "Inspected ENT-NORDIC at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 9,
+            "day": 0,
+            "tool": "commit_verdict",
+            "args": {
+              "verdict": "block",
+              "cited_evidence": [
+                "ENT-BFS",
+                "ENT-VEGA",
+                "ENT-BOREAL",
+                "PER-KOV",
+                "SDN-9921"
+              ]
+            },
+            "thought_sig": true,
+            "state_hash": "830801173365d8a2",
+            "summary": "Committed verdict=block on Day 0"
+          }
         ]
       }
     },
@@ -79,33 +475,180 @@
         "model": "gemini-4-carbon",
         "thinking": "HIGH",
         "verdict": "clear",
-        "cited_evidence": ["CA-SOS-202188412", "CTR-2026-991"],
-        "rationale": "Disambiguated phonetic SDN match (US-CA bakery CA-SOS-202188412 owned by US citizen Layla Farah vs. Syrian entity SY-4410). Advanced clock 1 day to verify settled Square POS catering receipts ($11,420) and automatic FinCEN CTR-2026-991 filing per POL-KYC-09.",
+        "cited_evidence": [
+          "CTR-2026-991",
+          "CA-SOS-202188412",
+          "ENT-ALNOOR",
+          "PER-FARAH",
+          "POL-KYC-09"
+        ],
+        "rationale": "Per Policy POL-KYC-09, Alert KYC-118 is cleared after verifying both required prongs: (1) Entity disambiguation: Al-Noor Artisan Bakery LLC (ENT-ALNOOR) is incorporated in California (US-CA, Reg #CA-SOS-202188412) and 100% beneficially owned by US citizen Layla Farah (PER-FARAH, DOB 1986-04-19, Oakland CA) with no upstream shell entities, clearly disambiguating the 89% phonetic name collision against Syrian SDN 'Al-Nour General Trading Co' (SY, Reg #SY-4410). (2) Cash deposit corroboration: Upon advancing to Day 1, settled POS and CTR records (CTR-2026-991) confirmed verified Square POS weekend wedding-catering cash receipts ($11,420 gross) matching the $11,400 cash deposit ahead of payroll, alongside an automatically filed FinCEN Currency Transaction Report (CTR-2026-991) with zero structuring indicators.",
         "sim_day_final": 1,
-        "tokens_used": 3105,
+        "tokens_used": 11589,
         "passed": true,
         "liability_incurred_usd": 0,
         "steps": [
-          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-ALNOOR"}, "thought_sig": true, "state_hash": "77b103e9c41022aa", "summary": "Verified CA registration mismatch vs SY-4410; noted POS batch settling Day 1"},
-          {"step": 2, "day": 0, "tool": "trace_ownership", "args": {"entity_id": "ENT-ALNOOR"}, "thought_sig": true, "state_hash": "77b103e9c41022aa", "summary": "Confirmed 100% US owner Layla Farah (0 SDN hits)"},
-          {"step": 3, "day": 1, "tool": "wait_days", "args": {"days": 1}, "thought_sig": true, "state_hash": "e509ab12f88c3104", "summary": "Advanced clock to Day 1 for POS & CTR settlement"},
-          {"step": 4, "day": 1, "tool": "inspect_dossier", "args": {"entity_id": "ENT-ALNOOR"}, "thought_sig": true, "state_hash": "e509ab12f88c3104", "summary": "Verified Square POS $11,420 batch + FinCEN CTR-2026-991"},
-          {"step": 5, "day": 1, "tool": "commit_verdict", "args": {"verdict": "clear", "cited_evidence": ["CA-SOS-202188412", "CTR-2026-991"]}, "thought_sig": true, "state_hash": "09f441dc882a773e", "summary": "Cleared legitimate merchant without wrongful payroll freeze"}
+          {
+            "step": 1,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-ALNOOR"
+            },
+            "thought_sig": true,
+            "state_hash": "1667ec240b4e2784",
+            "summary": "Inspected ENT-ALNOOR at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 2,
+            "day": 0,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "ENT-ALNOOR"
+            },
+            "thought_sig": true,
+            "state_hash": "8adc79b4bd526d58",
+            "summary": "Traced ENT-ALNOOR -> 1 direct owner(s)"
+          },
+          {
+            "step": 3,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "PER-FARAH"
+            },
+            "thought_sig": true,
+            "state_hash": "c3167ed97f39a556",
+            "summary": "Inspected PER-FARAH at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 4,
+            "day": 1,
+            "tool": "wait_days",
+            "args": {
+              "days": 1
+            },
+            "thought_sig": true,
+            "state_hash": "34a39f96bfb51b56",
+            "summary": "Advanced clock +1d to Day 1 (settled: ['1'])"
+          },
+          {
+            "step": 5,
+            "day": 1,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-ALNOOR"
+            },
+            "thought_sig": true,
+            "state_hash": "8ba26b14b6e19341",
+            "summary": "Inspected ENT-ALNOOR at Day 1 (settled days: 0,1)"
+          },
+          {
+            "step": 6,
+            "day": 1,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "PER-FARAH"
+            },
+            "thought_sig": true,
+            "state_hash": "607dbb6f940e5185",
+            "summary": "Inspected PER-FARAH at Day 1 (settled days: 0,1)"
+          },
+          {
+            "step": 7,
+            "day": 1,
+            "tool": "trace_ownership",
+            "args": {
+              "entity_id": "PER-FARAH"
+            },
+            "thought_sig": true,
+            "state_hash": "287fb4dc27513533",
+            "summary": "Traced PER-FARAH -> 0 direct owner(s)"
+          },
+          {
+            "step": 8,
+            "day": 1,
+            "tool": "commit_verdict",
+            "args": {
+              "cited_evidence": [
+                "CTR-2026-991",
+                "CA-SOS-202188412",
+                "ENT-ALNOOR",
+                "PER-FARAH",
+                "POL-KYC-09"
+              ],
+              "verdict": "clear"
+            },
+            "thought_sig": true,
+            "state_hash": "1b5a020dd874bcd9",
+            "summary": "Committed verdict=clear on Day 1"
+          }
         ]
       },
       "baseline": {
         "model": "gemini-4-hydrogen",
         "thinking": "LOW",
-        "verdict": "escalate",
-        "cited_evidence": ["CA-SOS-202188412"],
-        "rationale": "89% fuzzy SDN match combined with $11,400 cash deposit exceeding $10,000 without settled POS receipts on Day 0 warrants immediate escalation.",
-        "sim_day_final": 0,
-        "tokens_used": 645,
-        "passed": false,
-        "liability_incurred_usd": 45000,
+        "verdict": "clear",
+        "cited_evidence": [
+          "ENT-ALNOOR",
+          "CA-SOS-202188412",
+          "CTR-2026-991"
+        ],
+        "rationale": "Per POL-KYC-09, Al-Noor Artisan Bakery LLC (US-CA, Reg #CA-SOS-202188412) is disambiguated from the SDN candidate Al-Nour General Trading Co (SY, Reg #SY-4410) by jurisdiction and registration ID. Additionally, the $11,400 cash deposit is corroborated by settled Square POS receipts ($11,420 gross) and automatic FinCEN CTR filing (CTR-2026-991) with zero structuring indicators.",
+        "sim_day_final": 1,
+        "tokens_used": 4202,
+        "passed": true,
+        "liability_incurred_usd": 0,
         "steps": [
-          {"step": 1, "day": 0, "tool": "inspect_dossier", "args": {"entity_id": "ENT-ALNOOR"}, "thought_sig": false, "state_hash": "77b103e9c41022aa", "summary": "Saw 89% name score + unposted Day-0 cash deposit; did not wait 1 day"},
-          {"step": 2, "day": 0, "tool": "commit_verdict", "args": {"verdict": "escalate", "cited_evidence": ["CA-SOS-202188412"]}, "thought_sig": false, "state_hash": "d41908bc33e7109a", "summary": "Triggered wrongful freeze / escalation on Day 0 ($45k SLA/payroll harm)"}
+          {
+            "step": 1,
+            "day": 0,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-ALNOOR"
+            },
+            "thought_sig": true,
+            "state_hash": "1667ec240b4e2784",
+            "summary": "Inspected ENT-ALNOOR at Day 0 (settled days: 0)"
+          },
+          {
+            "step": 2,
+            "day": 1,
+            "tool": "wait_days",
+            "args": {
+              "days": 1
+            },
+            "thought_sig": true,
+            "state_hash": "747a46ec2344bb13",
+            "summary": "Advanced clock +1d to Day 1 (settled: ['1'])"
+          },
+          {
+            "step": 3,
+            "day": 1,
+            "tool": "inspect_dossier",
+            "args": {
+              "entity_id": "ENT-ALNOOR"
+            },
+            "thought_sig": true,
+            "state_hash": "10585f38a8e8b841",
+            "summary": "Inspected ENT-ALNOOR at Day 1 (settled days: 0,1)"
+          },
+          {
+            "step": 4,
+            "day": 1,
+            "tool": "commit_verdict",
+            "args": {
+              "cited_evidence": [
+                "ENT-ALNOOR",
+                "CA-SOS-202188412",
+                "CTR-2026-991"
+              ],
+              "verdict": "clear"
+            },
+            "thought_sig": true,
+            "state_hash": "5fdc274b89909621",
+            "summary": "Committed verdict=clear on Day 1"
+          }
         ]
       }
     }
