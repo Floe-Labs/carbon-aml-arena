@@ -1,48 +1,33 @@
-# FinTrap Arena — Stateful Financial-Crime Stress Test for Gemini Carbon
+# Floe Stateful Compliance Sandbox — Gemini Carbon vs. Hydrogen Audit
 
-Built from scratch with **Antigravity CLI (AGY)** and **Google Gemini Carbon**, deployed on **Google Cloud Run**.
+Built with **Antigravity CLI (AGY)** and **Google Gemini Carbon**, deployed on **Google Cloud Run** (`https://carbon-aml-arena-715925646198.us-central1.run.app`).
 
-## Why Single-Turn Compliance Benchmarks Fail
+## Key Finding: Standard Outcome Evals Call These Agents Tied
 
-Banks and fintechs spend tens of billions annually investigating transaction-monitoring alerts, sanctions hits, and customer onboarding files. Standard single-turn QA benchmarks hide catastrophic operational failures because real financial-crime investigations are **stateful, multi-day processes with irreversible legal and financial consequences**:
+On our stateful multi-day compliance sandbox with inline policy rules, both **Gemini Carbon** (`HIGH` reasoning + multi-turn `thoughtSignature`) and **Gemini Hydrogen** (`LOW` reasoning) hit **`3/3` on final verdict labels** (`Clear` / `Escalate` / `Block`). A standard single-label outcome benchmark calls them tied.
 
-1. **Delayed Adverse Evidence (`TRAP-01`):** Local Day-0 invoices look clean while a clearing-bank recall inquiry is still in transit (`Day 3` settlement). Fast reactive agents close the alert prematurely, allowing illicit funds to clear.
-2. **Split-Shell Indirect Sanctions (`TRAP-02`):** Neither direct holding company exceeds 50% ownership alone (`28%` + `26%`), but tracing both branches 2 hops upstream reveals the same OFAC SDN individual controls both shells (`54% >= 50%` aggregate blocked property under the public OFAC 50% rule).
-3. **Phonetic False-Positive Collisions (`TRAP-03`):** An innocent US small business triggers an 89% fuzzy SDN name score alongside a legitimate `>$10,000` weekend catering cash deposit whose POS batch and FinCEN CTR settle on `Day 1`. Over-triggering a block freezes employee payroll.
+Deterministic step-trace auditing exposes a critical operational failure:
 
-## Gemini Carbon Technical Integration
+- **Skipped beneficial ownership (`2 of 3` alerts):** Hydrogen skipped `trace_ownership` completely on 2 of the 3 alerts—including clearing an **89% sanctions fuzzy name hit** without checking who owns the company.
+- **Stateful process audit (`3/3` vs `1/3`):** Carbon verified every required ownership gate and multi-day settlement wait (`Day 1` card/cash batch and `Day 3` interbank recall) across all 3 alerts.
+- **Verification depth (`27` vs `17` tool steps):** Carbon traced upstream beneficial owners, parent holding shells, and terminal nominees before committing dispositions.
 
-`app.py` (`<250` lines, zero external agent frameworks) runs **Gemini Carbon** (`thinkingLevel: "HIGH"` with multi-turn `thoughtSignature` preservation across `functionCall` / `functionResponse` turns) head-to-head against a fast low-thinking baseline (`gemini-4-hydrogen` with `thinkingLevel: "LOW"`) inside an isolated, deterministic 4-tool state machine:
+## Three Stateful Compliance Traps
 
-- `inspect_dossier(entity_id)` — reads records settled up to `sim_day`
-- `trace_ownership(entity_id)` — traverses 1-hop shareholder edges per call
-- `wait_days(days)` — advances the simulated compliance clock (`Day 0 -> Day N`)
-- `commit_verdict(verdict, cited_evidence, rationale)` — records final disposition (`clear | escalate | block`) with deterministic SHA-256 `state_hash` verification and zero-LLM grading
+1. **Sanctions 89% Name Hit (`bakery`):** Local bakery triggers an 89% phonetic sanctions match alongside an `\$11,400` Friday catering cash deposit before payroll (`Day 1` batch settlement). Clearing without checking beneficial ownership creates unverified sanctions exposure; freezing wrongfully harms payroll.
+2. **Interbank Wire Recall (`recall`):** Day-0 supplier invoices appear clean while a correspondent bank recall inquiry is still in transit (`Day 3` settlement confirming `\$68,600` split-bank structuring).
+3. **Split Offshore Shells (`shells`):** Direct name screening returns zero hits, while tracing two offshore holding firms two hops upstream reveals the same sanctioned individual controls `28% + 26% = 54% >= 50%` aggregate blocked property.
 
-## Quickstart
+## Technical Integration (`< 250` Lines of Python)
+
+`app.py` runs `gemini-4-carbon` (`thinkingLevel: "HIGH"` with `thoughtSignature` preserved across `functionCall` / `functionResponse` turns) head-to-head against `gemini-4-hydrogen` (`thinkingLevel: "LOW"`) inside a zero-framework, deterministic 4-tool state machine (`inspect_dossier`, `trace_ownership`, `wait_days`, `commit_verdict`) with deterministic gate auditing.
 
 ```bash
 pip install -r requirements.txt
-
-# 1. (Optional) Capture fresh live API traces with Gemini Carbon + Baseline into runs.json
-GEMINI_API_KEY="your_key" python app.py --capture
-
-# 2. Run interactive replay & comparison server locally (http://localhost:8080)
-python app.py
+GEMINI_API_KEY="your_key" python app.py --capture   # optional fresh capture
+python app.py                                       # http://localhost:8080
 ```
 
-## Deploy to Google Cloud Run
+## Anti-Contamination & Institutional Platform
 
-The container loads instant deterministic baseline/Carbon traces on startup (`<50ms` cold render) **and** exposes an interactive **`▶ Run Live`** button (`POST /run-live` with per-IP/hourly rate limiting, cross-site POST protection, and optional BYO API key input) for live head-to-head execution on Cloud Run:
-
-```bash
-gcloud run deploy carbon-aml-arena \
-  --source . \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --max-instances=2
-```
-
-## Anti-Contamination & Commercial Note
-
-Because open-source repositories contaminate LLM pretraining corpora and invalidate held-out evaluation benchmarks, **FinTrap Arena** was built in a clean room using strictly public-domain regulatory rules and synthetic showcase scenarios. At **Floe Labs** (`floelabs.io`), we operate our closed-source institutional platform providing uncontaminated financial-crime RL environments, expert-adjudicated decision trajectories, and held-out agent validation for frontier AI labs and regulated financial institutions.
+Because public repositories enter pretraining corpora and invalidate held-out evaluations, this showcase is a clean-room slice built strictly from public regulatory principles and synthetic scenarios. **Floe Labs** (`https://floelabs.io`) operates private, uncontaminated multi-day bank environments, expert-adjudicated decision trajectories, and held-out agent validation for frontier AI labs and financial institutions.

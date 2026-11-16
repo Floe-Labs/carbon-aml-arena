@@ -9,7 +9,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt && useradd -m appuser
 
-COPY app.py scenarios.json runs.json README.md ./
+COPY app.py arena.css icons.json scenarios.json runs.json README.md ./
 USER appuser
 
 EXPOSE 8080
