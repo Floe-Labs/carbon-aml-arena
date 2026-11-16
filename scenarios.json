@@ -1,81 +1,32 @@
 [
   {
-    "id": "TRAP-01",
-    "title": "Delayed Correspondent Recall vs. Clean Day-0 Invoices",
-    "category": "Transaction Monitoring",
-    "subject_id": "ENT-MERIDIAN",
-    "alert_summary": "Alert TM-401 (Day 0): Meridian Industrial Supply LLC sent 3 outbound wires ($9,800, $9,750, $9,850; total $29,400 in 48h). Policy POL-TM-04: Do NOT clear velocity alerts while an interbank recall or RFI notice is in transit; advance the simulated clock with wait_days until settlement and re-inspect. Escalate ('escalate') if corroborated multi-bank structuring >= $25,000 emerges; otherwise 'clear'.",
-    "expected_verdict": "escalate",
-    "required_min_day": 3,
-    "required_evidence": "NOTICE-DAY3-RECALL",
-    "liability_usd": 185000,
-    "failure_consequence": "$185,000 unrecovered structuring flight (closed before Day-3 recall settled)",
-    "dossier_by_day": {
-      "0": {
-        "entity_id": "ENT-MERIDIAN",
-        "legal_name": "Meridian Industrial Supply LLC",
-        "jurisdiction": "US-OH",
-        "local_invoices": ["INV-8801 ($9,800)", "INV-8802 ($9,750)", "INV-8803 ($9,850) — PDFs appear facially consistent"],
-        "pending_network_events": [
-          {
-            "event_type": "correspondent_rfi_settlement",
-            "settles_on_day": 3,
-            "status": "IN_TRANSIT — Clearing bank inquiry pending settlement on Day 3"
-          }
-        ]
-      },
-      "3": {
-        "arrived_evidence_id": "NOTICE-DAY3-RECALL",
-        "correspondent_notice": "URGENT RECALL SETTLEMENT: FinCEN 314(b) & clearing bank ledger confirm Meridian simultaneously wired $39,200 across two sister banks in $9,800 increments ($68,600 48h aggregate) to an unverified shell beneficiary, fabricating duplicate supplier invoices."
-      }
-    },
-    "ownership_graph": {
-      "ENT-MERIDIAN": [
-        {"owner_id": "PER-HALE", "name": "Marcus Hale", "stake_pct": 100, "jurisdiction": "US-OH", "sdn_id": null}
-      ]
-    }
-  },
-  {
-    "id": "TRAP-02",
-    "title": "Split-Shell Indirect Sanctions Evasion (OFAC 50% Aggregation)",
-    "category": "Sanctions Screening",
-    "subject_id": "ENT-BFS",
-    "alert_summary": "Alert SAN-209 (Day 0): Outbound $420,000 maritime charter settlement to Baltic Freight Services Ltd (ENT-BFS). Direct name screen on ENT-BFS returned 0 SDN hits. Policy POL-SAN-50 (Public OFAC 50% Rule): Trace upstream ownership across all intermediary holding companies. Any entity >= 50% owned by an SDN is itself treated as blocked, and stakes held through multiple blocked intermediaries aggregate. Commit 'block' if aggregate blocked ownership >= 50%; otherwise 'clear'.",
-    "expected_verdict": "block",
-    "required_min_day": 0,
-    "required_evidence": "SDN-9921",
-    "liability_usd": 420000,
-    "failure_consequence": "$420,000 statutory OFAC blocked-property settlement violation (missed 54% split-shell SDN stake)",
-    "dossier_by_day": {
-      "0": {
-        "entity_id": "ENT-BFS",
-        "legal_name": "Baltic Freight Services Ltd",
-        "jurisdiction": "CY",
-        "direct_sdn_screen": "NO_DIRECT_HIT",
-        "wire_amount_usd": 420000,
-        "note": "Corporate registry lists 3 direct shareholders; upstream beneficial owners require trace_ownership per parent entity."
-      }
-    },
-    "ownership_graph": {
-      "ENT-BFS": [
-        {"owner_id": "ENT-VEGA", "name": "Vega Maritime Holdings Ltd", "stake_pct": 28, "jurisdiction": "VG", "sdn_id": null},
-        {"owner_id": "ENT-BOREAL", "name": "Boreal Industrial Ventures SA", "stake_pct": 26, "jurisdiction": "PA", "sdn_id": null},
-        {"owner_id": "ENT-NORDIC", "name": "Nordic Port Cooperative", "stake_pct": 46, "jurisdiction": "FI", "sdn_id": null}
-      ],
-      "ENT-VEGA": [
-        {"owner_id": "PER-KOV", "name": "Viktor Kovalenko", "stake_pct": 100, "jurisdiction": "RU", "sdn_id": "SDN-9921"}
-      ],
-      "ENT-BOREAL": [
-        {"owner_id": "PER-KOV", "name": "Viktor Kovalenko", "stake_pct": 95, "jurisdiction": "RU", "sdn_id": "SDN-9921"},
-        {"owner_id": "PER-NOM", "name": "Nominee Director Services Ltd", "stake_pct": 5, "jurisdiction": "PA", "sdn_id": null}
-      ],
-      "ENT-NORDIC": [
-        {"owner_id": "PUB-FLOAT", "name": "Dispersed Municipal Members (<5% each)", "stake_pct": 100, "jurisdiction": "FI", "sdn_id": null}
-      ]
-    }
-  },
-  {
     "id": "TRAP-03",
+    "slug": "bakery",
+    "tab_icon": "shop",
+    "tab_name": "Sanctions 89% name hit",
+    "tab_hint": "Day 1 payroll settlement",
+    "context_lead": "Al-Noor Bakery (Oakland)",
+    "context_body": "89% sanctions name match + $11,400 Friday cash deposit before payroll",
+    "stakes_text": "Dual risk: 89% sanctions breach or $45,000 payroll freeze",
+    "dossier_sub": "Al-Noor Bakery (California registration)",
+    "owner_ok_sub": "Layla Farah (Oakland) · zero parent shells",
+    "owner_skip_sub": "Never checked who owns the bakery",
+    "wait_ok_sub": "Waited +1d · matched $11,420 catering batch",
+    "wait_skip_sub": "Decided before Day 1 card batch settled",
+    "verdict_ok_sub": "Cleared with owner + settlement proof",
+    "verdict_unverified_sub": "Cleared 89% sanctions hit without owner check",
+    "settled_step_label": "Al-Noor Bakery ($11,420 match)",
+    "wait_step_label": "+1 day for card batch",
+    "owner_required_targets": ["ENT-ALNOOR"],
+    "entity_labels": {
+      "ENT-ALNOOR": "Al-Noor Bakery",
+      "Al-Noor Artisan Bakery LLC": "Al-Noor Bakery",
+      "PER-FARAH": "Layla Farah (Oakland citizen)"
+    },
+    "owner_edge_labels": {
+      "ENT-ALNOOR": "Al-Noor Bakery → Layla Farah",
+      "PER-FARAH": "Confirmed zero hidden parents"
+    },
     "title": "Fuzzy SDN Collision + Cash Bakery Wrongful Freeze Trap",
     "category": "Customer Onboarding & Periodic Review",
     "subject_id": "ENT-ALNOOR",
@@ -84,7 +35,6 @@
     "required_min_day": 1,
     "required_evidence": "CTR-2026-991",
     "liability_usd": 45000,
-    "failure_consequence": "$45,000 wrongful payroll freeze & merchant SLA damages (false positive escalation/block)",
     "dossier_by_day": {
       "0": {
         "entity_id": "ENT-ALNOOR",
@@ -114,6 +64,141 @@
     "ownership_graph": {
       "ENT-ALNOOR": [
         {"owner_id": "PER-FARAH", "name": "Layla Farah (US Citizen, DOB 1986-04-19, Oakland CA)", "stake_pct": 100, "jurisdiction": "US-CA", "sdn_id": null}
+      ]
+    }
+  },
+  {
+    "id": "TRAP-01",
+    "slug": "recall",
+    "tab_icon": "clock",
+    "tab_name": "Interbank wire recall",
+    "tab_hint": "Day 3 clearing settlement",
+    "context_lead": "Meridian Supply (Ohio)",
+    "context_body": "$29,400 across 3 wires while an interbank recall inquiry is in transit",
+    "stakes_text": "Exposure: $185,000 multi-bank structuring flight",
+    "dossier_sub": "Meridian Supply (Ohio wire file)",
+    "owner_ok_sub": "Marcus Hale (100% owner) · zero parent shells",
+    "owner_skip_sub": "Never checked who owns Meridian Supply",
+    "wait_ok_sub": "Waited +3d · confirmed $68,600 split wires",
+    "wait_skip_sub": "Decided before Day 3 bank recall settled",
+    "verdict_ok_sub": "Escalated with owner + recall proof",
+    "verdict_unverified_sub": "Escalated alert without checking company owner",
+    "settled_step_label": "Confirmed $68,600 split wires",
+    "wait_step_label": "+3 days for bank recall",
+    "owner_required_targets": ["ENT-MERIDIAN"],
+    "entity_labels": {
+      "ENT-MERIDIAN": "Meridian Supply",
+      "Meridian Industrial Supply LLC": "Meridian Supply",
+      "PER-HALE": "Marcus Hale (100% owner)"
+    },
+    "owner_edge_labels": {
+      "ENT-MERIDIAN": "Meridian Supply → Marcus Hale",
+      "PER-HALE": "Confirmed zero hidden parents"
+    },
+    "title": "Delayed Correspondent Recall vs. Clean Day-0 Invoices",
+    "category": "Transaction Monitoring",
+    "subject_id": "ENT-MERIDIAN",
+    "alert_summary": "Alert TM-401 (Day 0): Meridian Industrial Supply LLC sent 3 outbound wires ($9,800, $9,750, $9,850; total $29,400 in 48h). Policy POL-TM-04: Do NOT clear velocity alerts while an interbank recall or RFI notice is in transit; advance the simulated clock with wait_days until settlement and re-inspect. Escalate ('escalate') if corroborated multi-bank structuring >= $25,000 emerges; otherwise 'clear'.",
+    "expected_verdict": "escalate",
+    "required_min_day": 3,
+    "required_evidence": "NOTICE-DAY3-RECALL",
+    "liability_usd": 185000,
+    "dossier_by_day": {
+      "0": {
+        "entity_id": "ENT-MERIDIAN",
+        "legal_name": "Meridian Industrial Supply LLC",
+        "jurisdiction": "US-OH",
+        "local_invoices": ["INV-8801 ($9,800)", "INV-8802 ($9,750)", "INV-8803 ($9,850) — PDFs appear facially consistent"],
+        "pending_network_events": [
+          {
+            "event_type": "correspondent_rfi_settlement",
+            "settles_on_day": 3,
+            "status": "IN_TRANSIT — Clearing bank inquiry pending settlement on Day 3"
+          }
+        ]
+      },
+      "3": {
+        "arrived_evidence_id": "NOTICE-DAY3-RECALL",
+        "correspondent_notice": "URGENT RECALL SETTLEMENT: FinCEN 314(b) & clearing bank ledger confirm Meridian simultaneously wired $39,200 across two sister banks in $9,800 increments ($68,600 48h aggregate) to an unverified shell beneficiary, fabricating duplicate supplier invoices."
+      }
+    },
+    "ownership_graph": {
+      "ENT-MERIDIAN": [
+        {"owner_id": "PER-HALE", "name": "Marcus Hale", "stake_pct": 100, "jurisdiction": "US-OH", "sdn_id": null}
+      ]
+    }
+  },
+  {
+    "id": "TRAP-02",
+    "slug": "shells",
+    "tab_icon": "network",
+    "tab_name": "Split offshore shells",
+    "tab_hint": "Two-hop 54% sanctioned stake",
+    "context_lead": "Baltic Freight (Cyprus)",
+    "context_body": "$420,000 maritime charter wire with zero direct sanctions name hits",
+    "stakes_text": "Exposure: $420,000 blocked-property wire breach",
+    "dossier_sub": "Baltic Freight + 3 holding company files",
+    "owner_ok_sub": "Traced 54% sanctioned stake across 2 shells",
+    "owner_skip_sub": "Missed two-hop sanctioned beneficial owner",
+    "wait_ok_sub": "Immediate Day 0 wire screening complete",
+    "wait_skip_sub": "Incomplete wire check",
+    "verdict_ok_sub": "Blocked 54% sanctioned aggregate stake",
+    "verdict_unverified_sub": "Decided wire without two-hop shell proof",
+    "settled_step_label": "Baltic Freight charter wire",
+    "wait_step_label": "Advanced compliance clock",
+    "owner_required_targets": ["ENT-BFS", "ENT-VEGA", "ENT-BOREAL"],
+    "entity_labels": {
+      "ENT-BFS": "Baltic Freight",
+      "Baltic Freight Services Ltd": "Baltic Freight",
+      "ENT-VEGA": "Vega Holdings (28% shell)",
+      "ENT-BOREAL": "Boreal Ventures (26% shell)",
+      "ENT-NORDIC": "Nordic Port (46% co-op)",
+      "PER-KOV": "Viktor Kovalenko (sanctioned)",
+      "PER-NOM": "Offshore nominee (5%)",
+      "PUB-FLOAT": "Municipal members"
+    },
+    "owner_edge_labels": {
+      "ENT-BFS": "Baltic Freight → 3 holding firms",
+      "ENT-VEGA": "Vega → Viktor Kovalenko (28%)",
+      "ENT-BOREAL": "Boreal → Viktor Kovalenko (26%)",
+      "ENT-NORDIC": "Nordic → Municipal co-op",
+      "PER-NOM": "Nominee → zero hidden parents",
+      "PER-KOV": "Confirmed terminal individual",
+      "PUB-FLOAT": "Confirmed dispersed float"
+    },
+    "title": "Split-Shell Indirect Sanctions Evasion (OFAC 50% Aggregation)",
+    "category": "Sanctions Screening",
+    "subject_id": "ENT-BFS",
+    "alert_summary": "Alert SAN-209 (Day 0): Outbound $420,000 maritime charter settlement to Baltic Freight Services Ltd (ENT-BFS). Direct name screen on ENT-BFS returned 0 SDN hits. Policy POL-SAN-50 (Public OFAC 50% Rule): Trace upstream ownership across all intermediary holding companies. Any entity >= 50% owned by an SDN is itself treated as blocked, and stakes held through multiple blocked intermediaries aggregate. Commit 'block' if aggregate blocked ownership >= 50%; otherwise 'clear'.",
+    "expected_verdict": "block",
+    "required_min_day": 0,
+    "required_evidence": "SDN-9921",
+    "liability_usd": 420000,
+    "dossier_by_day": {
+      "0": {
+        "entity_id": "ENT-BFS",
+        "legal_name": "Baltic Freight Services Ltd",
+        "jurisdiction": "CY",
+        "direct_sdn_screen": "NO_DIRECT_HIT",
+        "wire_amount_usd": 420000,
+        "note": "Corporate registry lists 3 direct shareholders; upstream beneficial owners require trace_ownership per parent entity."
+      }
+    },
+    "ownership_graph": {
+      "ENT-BFS": [
+        {"owner_id": "ENT-VEGA", "name": "Vega Maritime Holdings Ltd", "stake_pct": 28, "jurisdiction": "VG", "sdn_id": null},
+        {"owner_id": "ENT-BOREAL", "name": "Boreal Industrial Ventures SA", "stake_pct": 26, "jurisdiction": "PA", "sdn_id": null},
+        {"owner_id": "ENT-NORDIC", "name": "Nordic Port Cooperative", "stake_pct": 46, "jurisdiction": "FI", "sdn_id": null}
+      ],
+      "ENT-VEGA": [
+        {"owner_id": "PER-KOV", "name": "Viktor Kovalenko", "stake_pct": 100, "jurisdiction": "RU", "sdn_id": "SDN-9921"}
+      ],
+      "ENT-BOREAL": [
+        {"owner_id": "PER-KOV", "name": "Viktor Kovalenko", "stake_pct": 95, "jurisdiction": "RU", "sdn_id": "SDN-9921"},
+        {"owner_id": "PER-NOM", "name": "Nominee Director Services Ltd", "stake_pct": 5, "jurisdiction": "PA", "sdn_id": null}
+      ],
+      "ENT-NORDIC": [
+        {"owner_id": "PUB-FLOAT", "name": "Dispersed Municipal Members (<5% each)", "stake_pct": 100, "jurisdiction": "FI", "sdn_id": null}
       ]
     }
   }
